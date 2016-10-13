@@ -1,6 +1,7 @@
-package controllers
+package controllers.rest
 
 import javax.inject.Inject
+
 import models.User
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
@@ -13,13 +14,21 @@ import services.Impl.UserServiceImpl
 /**
   * Created by acer on 10/12/2016.
   */
-class UserController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Controller
+
+/*case class GetAllUsers(paginationParams: Pagination) extends PaginatedDataRequest
+
+case class AllUsersSummary(paginationParams: Pagination,
+                           totalRecordsAvailable: Int,
+                           totalPages: Int,
+                           records: List[User]) extends PaginatedDataResponse[User]*/
+
+class UserRController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with MongoController with ReactiveMongoComponents {
 
   def userService = new UserServiceImpl(reactiveMongoApi)
 
   def getAllUsers = Action.async {implicit request =>
-    userService.getAllUsers().map(users => Ok(Json.prettyPrint(Json.toJson(users))))
+    userService.getAllUsers().map(users => Ok(Json.prettyPrint(Json.obj("DATA" -> Json.toJson(users)))))
   }
 
   def getUser(id: String) = Action.async { implicit request =>

@@ -2,6 +2,7 @@ package Repositories
 
 import javax.inject.Inject
 
+import filters.UserFilter
 import models.User
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -10,6 +11,7 @@ import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONObjectID, BSONDocument}
 import reactivemongo.play.json.collection.JSONCollection
+import utils.Pagination
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,4 +42,9 @@ class UserRepo @Inject()(reactiveMongoApi: ReactiveMongoApi){
   def insertUser(user: User)(implicit ec: ExecutionContext): Future[WriteResult] = {
     collection.flatMap(_.insert(user))
   }
+
+  def count(userFilter: UserFilter)(implicit ec: ExecutionContext): Future[Int] = {
+    collection.flatMap(_.count())
+  }
+
 }
