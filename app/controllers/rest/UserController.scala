@@ -8,31 +8,29 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import services.Impl.UserServiceImpl
+import services.UserService
+import utils.Pagination
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 /**
   * Created by acer on 10/12/2016.
   */
 
-/*case class GetAllUsers(paginationParams: Pagination) extends PaginatedDataRequest
-
-case class AllUsersSummary(paginationParams: Pagination,
-                           totalRecordsAvailable: Int,
-                           totalPages: Int,
-                           records: List[User]) extends PaginatedDataResponse[User]*/
-
-class UserRController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Controller
+class UserController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with MongoController with ReactiveMongoComponents {
 
-  def userService = new UserServiceImpl(reactiveMongoApi)
+  def userService = new UserService(reactiveMongoApi)
 
-  def getAllUsers = Action.async {implicit request =>
-    userService.getAllUsers().map(users => Ok(Json.prettyPrint(Json.obj("DATA" -> Json.toJson(users)))))
+  def getAllUsers(page:Int, limit:Int) = Action.async {implicit request =>
+    val totalCount = Await.result(userService.count(),10 seconds)
+    val pagination = new Pagination(page, limit, totalCount)
+    userService.getAllUsers(pagination).map(users => Ok(Json.obj("DATA" -> Json.toJson(users), "PAGINATION" -> Json.toJson(pagination))))
   }
 
-  def getUser(id: String) = Action.async { implicit request =>
-    userService.getUser(BSONDocument("_id" -> BSONObjectID(id))).map(user => Ok(Json.prettyPrint(Json.toJson(user))))
+  def getUserId(id: String) = Action.async { implicit request =>
+    userService.getUserId(BSONDocument("_id" -> BSONObjectID(id))).map(user => Ok(Json.prettyPrint(Json.toJson(user))))
   }
 
   def insertUser = Action.async(BodyParsers.parse.json) { implicit request =>
@@ -48,5 +46,4 @@ class UserRController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends 
   def deleteUser(id: String) = Action.async(BodyParsers.parse.json) { implicit request =>
     userService.deleteUser(BSONDocument("_id" -> BSONObjectID(id))).map(result => Accepted)
   }
-
 }

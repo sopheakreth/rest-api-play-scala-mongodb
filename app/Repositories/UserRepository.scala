@@ -7,7 +7,7 @@ import models.User
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json._
-import reactivemongo.api.ReadPreference
+import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONObjectID, BSONDocument}
 import reactivemongo.play.json.collection.JSONCollection
@@ -18,16 +18,16 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Created by acer on 10/12/2016.
   */
-class UserRepo @Inject()(reactiveMongoApi: ReactiveMongoApi){
+class UserRepository @Inject()(reactiveMongoApi: ReactiveMongoApi){
   def collection(implicit ec: ExecutionContext) = reactiveMongoApi.database.map(_.collection[JSONCollection]("users"))
 
-  def getAllUsers()(implicit ec: ExecutionContext): Future[List[JsObject]] = {
-    val genericQueryBuilder = collection.map(_.find(Json.obj()));
+  def getAllUsers(pagination: Pagination)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
+    val genericQueryBuilder = collection.map(_.find(Json.obj()).options(QueryOpts(pagination.Offset)));
     val cursor = genericQueryBuilder.map(_.cursor[JsObject](ReadPreference.Primary));
-    cursor.flatMap(_.collect[List]())
+    cursor.flatMap(_.collect[List](pagination.Limit))
   }
 
-  def getUser(id: BSONDocument)(implicit ec: ExecutionContext): Future[Option[JsObject]] = {
+  def getUserId(id: BSONDocument)(implicit ec: ExecutionContext): Future[Option[JsObject]] = {
     collection.flatMap(_.find(id).one[JsObject])
   }
 
@@ -43,8 +43,7 @@ class UserRepo @Inject()(reactiveMongoApi: ReactiveMongoApi){
     collection.flatMap(_.insert(user))
   }
 
-  def count(userFilter: UserFilter)(implicit ec: ExecutionContext): Future[Int] = {
-    collection.flatMap(_.count())
+  def count()(implicit ec: ExecutionContext): Future[Int] = {
+    val count = collection.flatMap(_.count()); count
   }
-
 }
