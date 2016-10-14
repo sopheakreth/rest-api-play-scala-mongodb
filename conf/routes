@@ -9,7 +9,7 @@ GET     /                           controllers.HomeController.index
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # User controller showing
-GET     /api/v1/users                   controllers.rest.UserController.getAllUsers(page:Int,limit:Int)
+GET     /api/v1/users                   controllers.rest.UserController.getAllUsers(page: Int,limit: Int,sort: Int?=1)
 GET     /api/v1/users/:id               controllers.rest.UserController.getUserId(id: String)
 POST    /api/v1/users                   controllers.rest.UserController.insertUser
 DELETE  /api/v1/users/:id               controllers.rest.UserController.deleteUser(id: String)

@@ -6,16 +6,26 @@ import play.api.libs.json._
   * Created by acer on 10/13/2016.
   */
 class Pagination(page: Int, limit: Int, totalCount: Int) {
+
+  // variable use with pagination
   val Page: Int = page
   val Limit: Int = limit
   val TotalCount: Int = totalCount
   val TotalPages: Int = Math.ceil(totalCount / limit.asInstanceOf[Double]).asInstanceOf[Int]
   val Offset: Int = (Page - 1) * Limit
+
+/*  def sorting(sort: String){
+    val numSort = sort match {
+      case "ASC" => -1
+      case "DESC" => 1
+    }
+    return numSort;
+  }*/
 }
 
 object Pagination {
   implicit object PaginationFormat extends OWrites[Pagination] {
-    // TODO: convert from Pagination object to JSON
+    //TODO: convert from Pagination object to JSON
     def writes(p: Pagination): JsObject = Json.obj(
       "PAGE" -> p.Page,
       "LIMIT" -> p.Limit,

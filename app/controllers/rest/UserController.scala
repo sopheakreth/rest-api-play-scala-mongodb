@@ -23,10 +23,11 @@ class UserController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends C
 
   def userService = new UserService(reactiveMongoApi)
 
-  def getAllUsers(page:Int, limit:Int) = Action.async {implicit request =>
+  def getAllUsers(page:Int, limit:Int, sort: Int) = Action.async {implicit request =>
+
     val totalCount = Await.result(userService.count(),10 seconds)
     val pagination = new Pagination(page, limit, totalCount)
-    userService.getAllUsers(pagination).map(users => Ok(Json.obj("DATA" -> Json.toJson(users), "PAGINATION" -> Json.toJson(pagination))))
+    userService.getAllUsers(pagination, sort).map(users => Ok(Json.obj("DATA" -> Json.toJson(users), "PAGINATION" -> Json.toJson(pagination))))
   }
 
   def getUserId(id: String) = Action.async { implicit request =>

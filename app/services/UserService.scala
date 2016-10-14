@@ -21,8 +21,8 @@ class UserService @Inject()(val reactiveMongoApi: ReactiveMongoApi){
     * service call function from user repository
     * function return value CRUD
     */
-  def getAllUsers(pagination: Pagination)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
-    userRepository.getAllUsers(pagination)
+  def getAllUsers(pagination: Pagination, sort: Int)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
+    userRepository.getAllUsers(pagination, sort)
   }
 
   def getUserId(id: BSONDocument)(implicit ec: ExecutionContext): Future[Option[JsObject]] = {
