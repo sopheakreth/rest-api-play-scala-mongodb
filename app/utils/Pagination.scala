@@ -14,13 +14,6 @@ class Pagination(page: Int, limit: Int, totalCount: Int) {
   val TotalPages: Int = Math.ceil(totalCount / limit.asInstanceOf[Double]).asInstanceOf[Int]
   val Offset: Int = (Page - 1) * Limit
 
-/*  def sorting(sort: String){
-    val numSort = sort match {
-      case "ASC" => -1
-      case "DESC" => 1
-    }
-    return numSort;
-  }*/
 }
 
 object Pagination {

@@ -1,6 +1,6 @@
 package Repositories
 
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 
 import filters.UserFilter
 import models.User
@@ -9,7 +9,7 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json._
 import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONObjectID, BSONDocument}
+import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.collection.JSONCollection
 import utils.Pagination
 
@@ -18,12 +18,20 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Created by acer on 10/12/2016.
   */
+@Singleton
 class UserRepository @Inject()(reactiveMongoApi: ReactiveMongoApi){
   def collection(implicit ec: ExecutionContext) = reactiveMongoApi.database.map(_.collection[JSONCollection]("users"))
 
   //TODO: find all users in collection
-  def getAllUsers(pagination: Pagination, sort: Int)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
-    val genericQueryBuilder = collection.map(_.find(Json.obj()).sort(Json.obj("username" -> sort)).options(QueryOpts(pagination.Offset)))
+  def getAllUsers(pagination: Pagination, sortField: String)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
+
+    val sort: String = sortField.split(" ").flatMap(_.headOption).mkString
+    var getField = sortField.substring(1)
+    var s : Int = 1
+    if (sort =="-"){ s = -1 }
+    else{ getField = sortField }
+
+    val genericQueryBuilder = collection.map(_.find(Json.obj()).sort(Json.obj(getField -> s)).options(QueryOpts(pagination.Offset)))
     val cursor = genericQueryBuilder.map(_.cursor[JsObject](ReadPreference.Primary));
     cursor.flatMap(_.collect[List](pagination.Limit))
   }
