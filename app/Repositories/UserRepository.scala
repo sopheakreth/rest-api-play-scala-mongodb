@@ -24,7 +24,6 @@ class UserRepository @Inject()(reactiveMongoApi: ReactiveMongoApi){
 
   //TODO: find all users in collection
   def getAllUsers(pagination: Pagination, sortField: String)(implicit ec: ExecutionContext): Future[List[JsObject]] = {
-
     val sort: String = sortField.split(" ").flatMap(_.headOption).mkString
     var getField = sortField.substring(1)
     var s : Int = 1
