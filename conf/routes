@@ -9,8 +9,11 @@ GET     /                           controllers.HomeController.index
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # User controller showing
-GET     /api/v1/users                   controllers.rest.UserController.getAllUsers(page: Int?=1,limit: Int?=15,sort: String)
+GET     /api/v1/users                   controllers.rest.UserController.getAllUsers(page: Int?=1,limit: Int?=15,sort: String?="username")
 GET     /api/v1/users/:id               controllers.rest.UserController.getUserId(id: String)
 POST    /api/v1/users                   controllers.rest.UserController.insertUser
 DELETE  /api/v1/users/:id               controllers.rest.UserController.deleteUser(id: String)
 PATCH   /api/v1/users/:id               controllers.rest.UserController.updateUser(id: String)
+
+GET     /api/v1/translators             controllers.rest.TranslatorController.getAllTranslators(page: Int?=1,limit: Int?=15,sort: String?="firstname")
+POST    /api/v1/translators             controllers.rest.TranslatorController.insertTranslator

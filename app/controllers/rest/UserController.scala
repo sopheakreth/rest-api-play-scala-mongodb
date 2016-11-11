@@ -2,13 +2,13 @@ package controllers.rest
 
 import javax.inject.Inject
 
+import Repositories.UserRepository
 import models.User
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import services.UserService
 import utils.Pagination
 
 import scala.concurrent.Await
@@ -18,10 +18,8 @@ import scala.concurrent.duration._
   * Created by acer on 10/12/2016.
   */
 
-class UserController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Controller
+class UserController @Inject()(val userService: UserRepository, val reactiveMongoApi: ReactiveMongoApi) extends Controller
   with MongoController with ReactiveMongoComponents {
-
-  def userService = new UserService(reactiveMongoApi)
 
   def getAllUsers(page:Int, limit:Int, sort: String) = Action.async {implicit request =>
 
